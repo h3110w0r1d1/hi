@@ -13,16 +13,16 @@
 function tokenize(input) {
   const tokenTypes = [
     // 🎯 Keywords (language reserved words)
-    { type: "Keyword", regex: /^(new|from|public|private|return|function|var|const|let)\b/ },
+    { type: "Keyword", regex: /^(inport|as|new|from|public|private|return|function|var|const|let|continue|name|export)\b/ },
 
     // 🎯 Types (primitive and custom)
-    { type: "Type", regex: /^(string|number|boolean|object|File|Map|Array)\b/ },
+    { type: "Type", regex: /^(string|number|boolean|object|File|Map|Array|Function)\b/ },
 
     // 🎯 Boolean literals
     { type: "Boolean", regex: /^(true|false)\b/ },
 
     // 🎯 Assignment operators
-    { type: "AssignmentOperator", regex: /^(=~>|_>|:=|=)/ },
+    { type: "AssignmentOperator", regex: /^(=~>|_>|:=|=|~>|~~>|-~>|~->|_~>|~_>|_-~>)/ },
 
     // 🎯 Comparison operators
     { type: "ComparisonOperator", regex: /^(==|!=|<=|>=|<|>)/ },
