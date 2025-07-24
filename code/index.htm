@@ -1,1 +1,91 @@
 
+function tokenize(input) {
+  const tokenTypes = [
+    // 🎯 Keywords (language reserved words)
+    { type: "Keyword", regex: /^(new|from|public|private|return|function|var|const|let)\b/ },
+
+    // 🎯 Types (primitive and custom)
+    { type: "Type", regex: /^(string|number|boolean|object|File|Map|Array)\b/ },
+
+    // 🎯 Boolean literals
+    { type: "Boolean", regex: /^(true|false)\b/ },
+
+    // 🎯 Assignment operators
+    { type: "AssignmentOperator", regex: /^(=~>|_>|:=|=)/ },
+
+    // 🎯 Comparison operators
+    { type: "ComparisonOperator", regex: /^(==|!=|<=|>=|<|>)/ },
+
+    // 🎯 Logical/math operators
+    { type: "Operator", regex: /^(\+|\-|\*|\/|&&|\|\|)/ },
+
+    // 🎯 String literal
+    { type: "String", regex: /^"([^"\\]*(\\.[^"\\]*)*)"/ },
+
+    // 🎯 Numbers
+    { type: "Number", regex: /^[0-9]+(\.[0-9]+)?/ },
+
+    // 🎯 Identifier (variable or function name)
+    { type: "Identifier", regex: /^[a-zA-Z_][a-zA-Z0-9_]*/ },
+
+    // 🎯 Dot (object access)
+    { type: "Dot", regex: /^\./ },
+
+    // 🎯 Pipe (| character)
+    { type: "Pipe", regex: /^\|/ },
+
+    // 🎯 Symbols (punctuation and delimiters)
+    { type: "Symbol", regex: /^[\[\]\(\)\{\},;:]/ },
+
+    // 🎯 Comments (single and block)
+    { type: "Comment", regex: /^\/\/[^\n]*/ },              // Single-line
+    { type: "Comment", regex: /^\/\*[\s\S]*?\*\// },        // Multi-line
+
+    // 🎯 Whitespace (ignored but tracked for line/column)
+    { type: "Whitespace", regex: /^\s+/, ignore: true }
+  ];
+
+  const tokens = [];
+  let current = 0;
+  let line = 1;
+  let column = 1;
+
+  function advance(str) {
+    const lines = str.split("\n");
+    if (lines.length > 1) {
+      line += lines.length - 1;
+      column = lines[lines.length - 1].length + 1;
+    } else {
+      column += str.length;
+    }
+  }
+
+  while (current < input.length) {
+    const str = input.slice(current);
+    let matched = false;
+
+    for (const { type, regex, ignore } of tokenTypes) {
+      const match = regex.exec(str);
+      if (match) {
+        const value = match[0];
+        if (!ignore) {
+          tokens.push({ type, value, line, column });
+        }
+        advance(value);
+        current += value.length;
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) {
+      // Unrecognized character — capture as error token
+      const char = input[current];
+      tokens.push({ type: "Error", value: char, line, column });
+      advance(char);
+      current++;
+    }
+  }
+
+  return tokens;
+}
